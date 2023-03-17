@@ -1,81 +1,95 @@
-<script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=qb8k02fqhx"></script>
-<div id="map" style="width:100%;height:400px;"></div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>현재 위치</title>
+    <style>
+        .map_wrap {position:relative;width:100%;height:500px;}
+        .title {font-weight:bold;display:block;}
+        .hAddr {position:absolute;left:10px;top:10px;border-radius: 2px;background:#fff;background:rgba(255,255,255,0.8);z-index:1;padding:5px;}
+        #centerAddr {display:block;margin-top:2px;font-weight: normal;}
+        .bAddr {padding:5px;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;}
+    </style>
+</head>
+<body>
+<div class="map_wrap">
+    <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
+</div>
+
+<script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=805bf9de3cbac260157de2dbe231b4c4&libraries=services"></script>
 <script>
+            // 부모창에서 데이터 넘겨 받는 리스너
+            window.addEventListener("message", function(event) {
+                var lat = event.data.lat;
+                var lng = event.data.lng;
 
-    function createMap(geoPos){
-        var crd = geoPos.coords;
+                // 지도 생성 옵션
+                var container = document.getElementById('map');
+                var options = {
+                    center: new kakao.maps.LatLng(lat, lng),
+                    level: 4
+                };
 
-        console.log('찍을라고');
-        console.log('Your current position is:');
-        console.log('Latitude : ' + crd.latitude);
-        console.log('Longitude: ' + crd.longitude);
-        console.log('More or less ' + crd.accuracy + ' meters.');
+                // 지도를 생성합니다
+                var map = new kakao.maps.Map(container, options);
 
-        var mapOptions = {
-            center: new naver.maps.LatLng(crd.latitude, crd.longitude),
-            zoom: 18
-        };
-        var map = new naver.maps.Map('map', mapOptions);
+                // 주소-좌표 변환 객체를 생성합니다
+                var geocoder = new kakao.maps.services.Geocoder();
 
-        var marker = new naver.maps.Marker({
-            position: new naver.maps.LatLng(crd.latitude, crd.longitude),
-            title: '현위치',
-            map: map
-        });
-    }
+                var marker = new kakao.maps.Marker(); // 클릭한 위치를 표시할 마커입니다
+                var infowindow = new kakao.maps.InfoWindow({zindex:1}); // 클릭한 위치에 대한 주소를 표시할 인포윈도우입니다
 
-    /*
-    var contentString = [
-        '<div class="iw_inner" onclick="window.open(\'https://naver.me/FhAUVHe1\');" style="padding: 0px 20px 0px 20px">',
-        '   <h3>계명대학교</h3>',
-        '   <p>대구 달서구 신당동 산40-1<br>053-580-5114',
-        '   </p>',
-        '</div>'
-    ].join('');
+                // 지도를 클릭했을 때 클릭 위치 좌표에 대한 주소정보를 표시하도록 이벤트를 등록합니다
+                kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+                    searchDetailAddrFromCoords(mouseEvent.latLng, function(result, status) {
+                        if (status === kakao.maps.services.Status.OK) {
 
-    var infowindow = new naver.maps.InfoWindow({
-        content: contentString
-    });
+                            var address = ''; // 부모창으로 전달할 주소정보
+                            var detailAddr = !!result[0].road_address ? '<div>도로명 : ' + result[0].road_address.address_name + ' ' + result[0].road_address.building_name + '</div>' : '';
+                            detailAddr += '<div>지번 : ' + result[0].address.address_name + '</div>';
 
-    naver.maps.Event.addListener(marker, "click", function (e) {
-        if (infowindow.getMap()) {
-            infowindow.close();
-        } else {
-            infowindow.open(map, marker);
-        }
-    });
+                            // 도로명 주소 있으면 우선적으로 세팅
+                            if(!!result[0].road_address){
+                                address = result[0].road_address.address_name + ' ' + result[0].road_address.building_name;
+                            }else{
+                                address = result[0].address.address_name;
+                            }
 
-    infowindow.open(map, marker);
-    */
+                            var content = '<div class="bAddr">' +
+                                            detailAddr +
+                                        '</div>';
 
-    //현위치
-    var options = {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
-    };
+                            map.panTo(mouseEvent.latLng);
 
-    function success(pos) {
-      var crd = pos.coords;
+                            // 마커를 클릭한 위치에 표시합니다
+                            marker.setPosition(mouseEvent.latLng);
+                            marker.setMap(map);
 
-      console.log('새로 받아오나?');
-      console.log('Your current position is:');
-      console.log('Latitude : ' + crd.latitude);
-      console.log('Longitude: ' + crd.longitude);
-      console.log('More or less ' + crd.accuracy + ' meters.');
-    };
+                            // 인포윈도우에 클릭한 위치에 대한 법정동 상세 주소정보를 표시합니다
+                            infowindow.setContent(content);
+                            infowindow.open(map, marker);
 
-    function error(err) {
-      console.warn('ERROR(' + err.code + '): ' + err.message);
-    };
+                            //console.log('카카오 맵 : ' + mouseEvent.latLng.getLat() + ' ' + mouseEvent.latLng.getLng() + ' ' + address);
 
-    function getCurrentPosition() {
-        return new Promise(function(resolve, reject) {
-            //navigator.geolocation.getCurrentPosition(success, error, options)
-            navigator.geolocation.getCurrentPosition(resolve, reject, options)
-        });
-    }
+                            // 부모창으로 데이터 넘기기
+                            //const sendData = () =>
+                            var sendJson = {'lat':mouseEvent.latLng.getLat(),'lng':mouseEvent.latLng.getLng(),'address':address};
+                            //{'"lat"':mouseEvent.latLng.getLat(),'"lng"':mouseEvent.latLng.getLng(),'"address"':address}
+                            window.parent.postMessage(JSON.stringify(sendJson), "*");
+                        }
+                    });
+                });
 
-    getCurrentPosition().then(x => createMap(x));
+                function searchDetailAddrFromCoords(coords, callback) {
+                    // 좌표로 법정동 상세 주소 정보를 요청합니다
+                    geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
+                }
 
+                // 지도 중심 클릭
+                kakao.maps.event.trigger( map, 'click', {latLng : map.getCenter()} );
+
+            });
 </script>
+</body>
+</html>
