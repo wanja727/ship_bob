@@ -1,11 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'dart:html';
 import 'current_location.dart';
 import 'near_restaurants.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
