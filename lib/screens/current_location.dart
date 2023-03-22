@@ -1,18 +1,14 @@
 import 'dart:convert';
 import 'dart:html';
-import 'dart:js_util';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'main.dart';
+import 'package:kakao_map/screens/main.dart';
 
-// IFrameElement _iFrameElement = IFrameElement();
 var clickListener;
+double lat = 0, lng = 0;
 
 class CurrentLocation extends ConsumerStatefulWidget {
-  // double lat = 0, lng = 0;
-  // String address = '';
-
   CurrentLocation({Key? key}) : super(key: key);
 
   @override
@@ -20,37 +16,27 @@ class CurrentLocation extends ConsumerStatefulWidget {
 }
 
 class CurrentLocationState extends ConsumerState<CurrentLocation> {
-  // IFrameElement _iFrameElement = IFrameElement();
+  IFrameElement _iFrameElement = IFrameElement();
 
   @override
   void initState() {
-    IFrameElement _iFrameElement = IFrameElement();
-    print('init!!!!!!!!');
-
+    // 위치정보 객체 read
     UserPos pos = ref.read(userPosProvider);
-    print('객체비교3-1 : ${identityHashCode(pos)}');
 
+    // iframe 설정값
     _iFrameElement.src = 'assets/map.html';
     _iFrameElement.style.width = '100%';
     _iFrameElement.style.height = '100%';
     _iFrameElement.style.border = 'none';
 
-    onData(event) {
-      // pos = ref.read(userPosProvider);
-      print('객체비교3-2s : ${identityHashCode(pos)}');
-      print('객체비교3-2 : ${pos.toString()}');
-      _iFrameElement.contentWindow?.postMessage({'lat': pos.lat, 'lng': pos.lng}, "*");
-    }
+    // 전역변수에 옮겨준다
+    lat = pos.lat;
+    lng = pos.lng;
 
     // iframe으로 postMessage 보내기
-    _iFrameElement.onLoad.listen(onData);
-
-    // iframe으로 postMessage 보내기
-    // _iFrameElement.onLoad.listen((event) {
-    //   pos = ref.read(userPosProvider);
-    //   print('객체비교3-2 : ${identityHashCode(pos)}');
-    //   _iFrameElement.contentWindow?.postMessage({'lat': pos.lat, 'lng': pos.lng}, "*");
-    // });
+    _iFrameElement.onLoad.listen((event) {
+      _iFrameElement.contentWindow?.postMessage({'lat': lat, 'lng': lng}, "*");
+    });
 
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry.registerViewFactory(
@@ -62,39 +48,17 @@ class CurrentLocationState extends ConsumerState<CurrentLocation> {
       var data = (event as MessageEvent).data ?? '-';
       if (data != '-') {
         pos.setUserPos(jsonDecode(data)['lat'], jsonDecode(data)['lng'], jsonDecode(data)['address']);
-        print(pos.toString());
       }
     };
 
     // iframe에서 message 받아오기
     window.addEventListener("message", clickListener);
 
-    // // iframe에서 message 받아오기
-    // window.addEventListener("message", (event) {
-    //   var data = (event as MessageEvent).data ?? '-';
-    //   if (data != '-') {
-    //     // if(this.mounted){
-    //     //   setState(() {
-    //     //     widget.lat = jsonDecode(data)['lat'];
-    //     //     widget.lng = jsonDecode(data)['lng'];
-    //     //     widget.address = jsonDecode(data)['address'];
-    //     //   });
-    //     // }
-    //     pos.setUserPos(jsonDecode(data)['lat'], jsonDecode(data)['lng'], jsonDecode(data)['address']);
-    //     print(pos.toString());
-    //   }
-    // });
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
-
-
-
-
     return Scaffold(
       appBar: AppBar(
         title: Text('지금 계신곳을 알려주세요'),
@@ -106,27 +70,28 @@ class CurrentLocationState extends ConsumerState<CurrentLocation> {
                     MediaQuery.of(context).padding.top) *
                 0.70,
             width: double.infinity,
-            child: HtmlElementView(key: UniqueKey(),viewType: 'naver-map'),
+            child: HtmlElementView(key: UniqueKey(), viewType: 'naver-map'),
           ),
           OutlinedButton(
             child:
                 const Text('이 위치로 변경', style: TextStyle(color: Colors.black)),
             onPressed: () {
-              // _iFrameElement.onLoad.listen((event) {},);
+
+              // iframe에서 값 받아오는 리스너 삭제 (안하면 계속 쌓임)
               window.removeEventListener("message", clickListener);
 
+              // 기존 객체
               UserPos pos = ref.read(userPosProvider);
-              print('객체비교4 : ${identityHashCode(pos)}');
 
+              // 신규 객체
               UserPos newPos = UserPos();
+              // 기존 객체의 값을 받아서 동일하게 세팅한다
               newPos.setUserPos(pos.lat, pos.lng, pos.address);
-              print('객체비교5 : ${identityHashCode(newPos)}');
 
-              ref.read(userPosProvider.notifier).update(
-                  (state) => newPos);
+              // state 값을 신규 객체로 바꿔줌으로서 변경사항 반영되도록 한다
+              ref.read(userPosProvider.notifier).update((state) => newPos);
               Navigator.pop(
                 context,
-                // BoxedReturns(widget.lat, widget.lng, widget.address)
               );
             },
             style: ButtonStyle(
@@ -137,17 +102,4 @@ class CurrentLocationState extends ConsumerState<CurrentLocation> {
     );
   }
 
-  @override
-  void dispose() {
-    print("_iframeWidget is disposed?");
-    super.dispose();
-  }
-}
-
-class BoxedReturns{
-  final double lat;
-  final double lng;
-  final String address;
-
-  BoxedReturns(this.lat, this.lng, this.address);
 }

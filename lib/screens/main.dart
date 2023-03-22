@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'current_location.dart';
+import 'package:kakao_map/screens/current_location.dart';
 import 'near_restaurants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kakao_map/kakaomap_api.dart';
 
 void main() {
   runApp(
@@ -68,33 +70,32 @@ class HomePageState extends ConsumerState<HomePage> {
 
   @override
   void initState() {
+
     UserPos pos = ref.read(userPosProvider);
-
-    print('객체비교1 : ${identityHashCode(pos)}');
-
-    print('처음에');
     pos.setUserPos(0, 0, '');
-    print(pos.toString());
 
-    Future<Position> currPos = _determinePosition();
+    Future<Position> futurePos = _determinePosition();
 
-    currPos.then((value) {
-      // print('메인화면 - 현재위치 : ${value.latitude} ${value.longitude}');
-      pos.setUserPos(value.latitude, value.longitude, '');
-      print('나중에');
-      print(pos.toString());
+    futurePos.then((futurePosResult) {
+      // print('메인화면 - 현재위치 : ${futurePosResult.latitude} ${futurePosResult.longitude}');
 
-      // setState(() {
-      //   lat = value.latitude;
-      //   lng = value.longitude;
-      // });
-      // ref.read(userPosProvider.notifier).update((state) {
-      //
-      //   // state.lat = 111;
-      //   // state.lng = 222;
-      //   // state.address = '야호';
-      //   return UserPos(lat: 111, lng: 222, address: '야호');
-      // });
+      pos.setUserPos(futurePosResult.latitude, futurePosResult.longitude, '');
+
+      // 좌표->주소 변환 카카오맵 API호출
+      KakaoMapApi kakaoMapApi = KakaoMapApi();
+      Future<String> futureAddr = kakaoMapApi.getAddress(futurePosResult.latitude, futurePosResult.longitude);
+      // Future<String> futureAddr = kakaoMapApi.getAddress(37.55702771590781, 127.14952775554904);
+
+      futureAddr.then((futureAddrResult) {
+        // 신규 객체
+        UserPos newPos = UserPos();
+        // 기존 객체의 값을 받아서 동일하게 세팅한다
+        newPos.setUserPos(futurePosResult.latitude, futurePosResult.longitude, futureAddrResult);
+        // state 값을 신규 객체로 바꿔줌으로서 변경사항 반영되도록 한다
+        ref.read(userPosProvider.notifier).update((state) => newPos);
+      }).catchError((error) {
+        print(error);
+      });
     }).catchError((error) {
       print(error);
     });
@@ -128,12 +129,13 @@ class HomePageState extends ConsumerState<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Consumer(
-                builder: (context, ref, _) {
-                  UserPos pos = ref.watch(userPosProvider);
-                  print('객체비교2 : ${identityHashCode(pos)}');
-                  return Text(pos.address, style: TextStyle(fontSize: 20));
-                },
+              Flexible(
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    UserPos pos = ref.watch(userPosProvider);
+                    return Text(pos.address, style: TextStyle(fontSize: 20));
+                  },
+                ),
               ),
 
               IconButton(
@@ -145,19 +147,6 @@ class HomePageState extends ConsumerState<HomePage> {
                   );
                 },
               )
-
-              // IconButton(
-              //   icon: Icon(Icons.pin_drop_outlined),
-              //   onPressed: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //           builder: (context) => CurrentLocation(lat: widget.lat, lng: widget.lng)),
-              //     );
-              //   },
-              // )
-              // SelectionButton(lat: lat, lng: lng, setAddr: setAddr)
-              //SelectionButton(lat: 0, lng: 0, setAddr: ''),
             ],
           ),
           OutlinedButton(
@@ -195,68 +184,6 @@ class HomePageState extends ConsumerState<HomePage> {
     );
   }
 }
-
-// class SelectionButton extends StatelessWidget {
-//   double lat = 0, lng = 0;
-//   String address = '';
-//   final setAddr;
-//
-//   SelectionButton(
-//       {required this.lat, required this.lng, this.setAddr, super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     print('GPS버튼 : ${lat} ${lng}');
-//
-//     // return RaisedButton(
-//     //   onPressed: () {
-//     //     _navigateAndDisplaySelection(context);
-//     //   },
-//     //   child: Text('Pick an option, any option!'),
-//     // );
-//
-//     return IconButton(
-//       icon: Icon(Icons.pin_drop_outlined),
-//       onPressed: () {
-//         Future<BoxedReturns> recvdBox = _navigateAndDisplaySelection(context);
-//         recvdBox.then((value) => setAddr(value.address)).catchError((error) {
-//           print(error);
-//         });
-//
-//         // Navigator.push(
-//         //   context,
-//         //   MaterialPageRoute(
-//         //       builder: (context) => CurrentLocation(lat: widget.lat, lng: widget.lng)),
-//         // );
-//       },
-//     );
-//   }
-//
-//   // SelectionScreen을 띄우고 navigator.pop으로부터 결과를 기다리는 메서드
-//   Future<BoxedReturns> _navigateAndDisplaySelection(
-//       BuildContext context) async {
-//     // Navigator.push는 Future를 반환합니다. Future는 선택 창에서
-//     // Navigator.pop이 호출된 이후 완료될 것입니다.
-//     final BoxedReturns result = await Navigator.push(
-//       context,
-//       MaterialPageRoute(
-//           builder: (context) => CurrentLocation(lat: lat, lng: lng)),
-//     );
-//     // if (!context.mounted) return;
-//     // if (!context.mounted) return;
-//
-//     print(result.address);
-//
-//     return result;
-//
-//     // 선택 창으로부터 결과 값을 받은 후, 이전에 있던 snackbar는 숨기고 새로운 결과 값을
-//     // 보여줍니다.
-//     // ScaffoldMessenger.of(context).widget.child();
-//
-//     // ..removeCurrentSnackBar()
-//     // ..showSnackBar(SnackBar(content: Text("${result.lng}")));
-//   }
-// }
 
 //현재위치 받아오는 함수
 Future<Position> _determinePosition() async {
