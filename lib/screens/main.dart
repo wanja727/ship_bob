@@ -7,6 +7,7 @@ import 'near_restaurants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_map/kakaomap_api.dart';
+import 'package:kakao_map/models/category_response.dart';
 
 void main() {
   runApp(
@@ -44,8 +45,13 @@ class UserPos {
 // ref.read(userPosProvider) 할 때마다 아래의 코드를 호출하는게 아니다
 // 최초로 생성한 객체를 계속 가져다 쓸수 있다 (싱글톤)
 final userPosProvider = StateProvider((ref) {
-  print('프로바이더 생성');
+  print('userPosProvider 프로바이더 생성');
   return UserPos();
+});
+
+final categoryResponseProvider = StateProvider((ref) {
+  print('categoryResponseProvider 프로바이더 생성');
+  return CategoryResponse();
 });
 
 class MyApp extends ConsumerWidget {
