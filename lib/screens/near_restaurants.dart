@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_map/screens/main.dart';
 import 'package:kakao_map/kakaomap_api.dart';
@@ -40,11 +39,30 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
     // Future<String> futureAddr =
     futureList = kakaoMapApi.getNearRestaurants(pos.lat, pos.lng, 300);
 
-    // futureAddr.then((futureAddrResult) {
-    //
-    // }).catchError((error) {
-    //   print(error);
-    // });
+    futureList.catchError((error) {
+      print(error);
+
+      // showDialog<void>(
+      //     context: context,
+      //     builder: (BuildContext context) {
+      //       return AlertDialog(
+      //         content: Text(error.toString()),
+      //         actions: <Widget>[
+      //           TextButton(
+      //             style: TextButton.styleFrom(
+      //               textStyle: Theme.of(context).textTheme.labelLarge,
+      //             ),
+      //             child: const Text('확인'),
+      //             onPressed: () {
+      //               Navigator.of(context).popUntil((route) => route.isFirst);
+      //             },
+      //           ),
+      //         ],
+      //       );
+      //     });
+
+    });
+
   }
 
   @override
@@ -135,6 +153,7 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                                   //   ),
                                   // ),
                                   // const Text('AlertDialog Title'),
+
                                 );
                               },
                             );

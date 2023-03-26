@@ -61,13 +61,8 @@ class KakaoMapApi{
         print('$page번째 JSON 받아온거');
         print(response.body);
 
+        // json->객체 매핑
         categoryResponse = category.CategoryResponse.fromJson(jsonDecode(response.body));
-
-        // nearRestaurants = categoryResponse.documents!.map<category.Documents>((element) {
-              // return element;
-            // }).toList();
-
-        // return nearRestaurants;
 
         resultMeta = categoryResponse.meta!;
         resultDocuments.addAll(categoryResponse.documents as Iterable<category.Documents>);

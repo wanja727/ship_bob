@@ -131,7 +131,8 @@ class HomePageState extends ConsumerState<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('뭐먹지?', style: TextStyle(fontSize: 40)),
+          Column(mainAxisAlignment: MainAxisAlignment.center,
+              children: const [Text('근 밥', style: TextStyle(fontSize: 40)),Text('(근처 밥집, 음식점 고르기)', style: TextStyle(fontSize: 18))]),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
