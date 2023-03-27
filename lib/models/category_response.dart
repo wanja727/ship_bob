@@ -4,6 +4,11 @@ class CategoryResponse {
 
   CategoryResponse({this.documents, this.meta});
 
+  setCategoryResponse(List<Documents> documents, Meta meta) {
+    this.documents = documents;
+    this.meta = meta;
+  }
+
   CategoryResponse.fromJson(Map<String, dynamic> json) {
     if (json['documents'] != null) {
       documents = <Documents>[];
@@ -92,8 +97,11 @@ class Meta {
   int? pageableCount;
   Null? sameName;
   int? totalCount;
+  double? lat;
+  double? lng;
+  int? radius;
 
-  Meta({this.isEnd, this.pageableCount, this.sameName, this.totalCount});
+  Meta({this.isEnd, this.pageableCount, this.sameName, this.totalCount, this.lat, this.lng, this.radius});
 
   Meta.fromJson(Map<String, dynamic> json) {
     isEnd = json['is_end'];

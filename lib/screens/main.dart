@@ -20,6 +20,7 @@ void main() {
 class UserPos {
   late double lat, lng;
   late String address;
+  late int radius;
 
   UserPos();
 
@@ -27,6 +28,10 @@ class UserPos {
     this.lat = lat;
     this.lng = lng;
     this.address = address;
+  }
+
+  setRadius(int radius){
+    this.radius = radius;
   }
 
   @override
@@ -77,20 +82,21 @@ class HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
 
+    CategoryResponse categoryRes = ref.read(categoryResponseProvider);
+
     UserPos pos = ref.read(userPosProvider);
     pos.setUserPos(0, 0, '');
 
     Future<Position> futurePos = _determinePosition();
 
     futurePos.then((futurePosResult) {
-      // print('메인화면 - 현재위치 : ${futurePosResult.latitude} ${futurePosResult.longitude}');
+      print('메인화면 - 현재위치 : ${futurePosResult.latitude} ${futurePosResult.longitude}');
 
       pos.setUserPos(futurePosResult.latitude, futurePosResult.longitude, '');
 
       // 좌표->주소 변환 카카오맵 API호출
       KakaoMapApi kakaoMapApi = KakaoMapApi();
       Future<String> futureAddr = kakaoMapApi.getAddress(futurePosResult.latitude, futurePosResult.longitude);
-      // Future<String> futureAddr = kakaoMapApi.getAddress(37.55702771590781, 127.14952775554904);
 
       futureAddr.then((futureAddrResult) {
         // 신규 객체
@@ -127,12 +133,15 @@ class HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 239, 245, 245),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(mainAxisAlignment: MainAxisAlignment.center,
-              children: const [Text('근 밥', style: TextStyle(fontSize: 40)),Text('(근처 밥집, 음식점 고르기)', style: TextStyle(fontSize: 18))]),
+          const Column(mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(image: AssetImage('assets/icon.jfif'),width: 200, height: 200),
+                Text('근 밥', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 106, 47, 14))),Text('(근처 밥집, 음식점 고르기)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 106, 47, 14)),)]),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -140,13 +149,13 @@ class HomePageState extends ConsumerState<HomePage> {
                 child: Consumer(
                   builder: (context, ref, _) {
                     UserPos pos = ref.watch(userPosProvider);
-                    return Text(pos.address, style: TextStyle(fontSize: 20));
+                    return Text(pos.address, style: const TextStyle(fontSize: 20, color: Color.fromARGB(255, 106, 47, 14)));
                   },
                 ),
               ),
 
               IconButton(
-                icon: Icon(Icons.pin_drop_outlined),
+                icon: const Icon(Icons.pin_drop_outlined, color: Color.fromARGB(255, 106, 47, 14)),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -157,34 +166,30 @@ class HomePageState extends ConsumerState<HomePage> {
             ],
           ),
           OutlinedButton(
-            child: const Text('땡기는 음식 찾아보기',
-                style: TextStyle(color: Colors.black)),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NearRestaurants()),
+              );
+            },
             style: ButtonStyle(
-                fixedSize: MaterialStateProperty.all(Size(200, 50))),
+                fixedSize: MaterialStateProperty.all(const Size(200, 50))),
+            child:
+            const Text('내 주변 음식점', style: TextStyle(color: Color.fromARGB(255, 106, 47, 14))),
           ),
-          Center(
-            child: OutlinedButton(
-              child:
-                  const Text('내 주변 음식점', style: TextStyle(color: Colors.black)),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NearRestaurants()),
-                );
-              },
-              style: ButtonStyle(
-                  fixedSize: MaterialStateProperty.all(Size(200, 50))),
-            ),
+          OutlinedButton(
+            onPressed: null,
+            style: ButtonStyle(
+                fixedSize: MaterialStateProperty.all(const Size(200, 50)), backgroundColor: const MaterialStatePropertyAll(Colors.black12)),
+            child: const Text('땡기는 음식 찾아보기',
+                style: TextStyle(color: Color.fromARGB(255, 106, 47, 14))),
           ),
-          Center(
-            child: OutlinedButton(
-              child:
-                  const Text('나만의 리스트', style: TextStyle(color: Colors.black)),
-              onPressed: () {},
-              style: ButtonStyle(
-                  fixedSize: MaterialStateProperty.all(Size(200, 50))),
-            ),
+          OutlinedButton(
+            onPressed: null,
+            style: ButtonStyle(
+                fixedSize: MaterialStateProperty.all(const Size(200, 50)),backgroundColor: const MaterialStatePropertyAll(Colors.black12)),
+            child:
+                const Text('나만의 리스트', style: TextStyle(color: Color.fromARGB(255, 106, 47, 14))),
           )
         ],
       ),

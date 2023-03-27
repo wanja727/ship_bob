@@ -61,7 +61,8 @@ class CurrentLocationState extends ConsumerState<CurrentLocation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('지금 계신곳을 알려주세요'),
+        backgroundColor: const Color.fromARGB(255, 106, 47, 14),
+        title: const Text('지금 계신곳을 알려주세요'),
       ),
       body: Column(
         children: [
