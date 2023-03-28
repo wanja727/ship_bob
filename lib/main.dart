@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kakao_map/screens/current_location.dart';
+import 'package:kakao_map/widgets/adfit.dart';
 import 'screens/near_restaurants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -194,6 +195,7 @@ class HomePageState extends ConsumerState<HomePage> {
           )
         ],
       ),
+      bottomNavigationBar: Container(alignment: Alignment.center,width: 320, height: 50,child: Adfit()),
     );
   }
 }
