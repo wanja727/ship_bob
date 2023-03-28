@@ -90,61 +90,64 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
               if (snapshot.hasData) {
                 return Column(
                   children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 10, bottom: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                              margin: const EdgeInsets.only(right: 200),
-                              child: Text(
-                                  '반경 500m이내  \'음식점\'  검색결과\n전체 $totalCount건 (MAX 45건 표기)',
-                                  style: const TextStyle(fontSize: 15,
-                                      color: Color.fromARGB(
-                                          255, 106, 47, 14)))),
-                          OutlinedButton(
-                            onPressed: () {
-                              // startController();
-                              int rngNum = currSelctedItem +
-                                  Random().nextInt(_itemCount) + 45;
+                    Center(
+                      child: Container(
+                        width: 600,
+                        margin: const EdgeInsets.all(10),
+                        child:
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                                '반경 500m이내  \'음식점\'  검색결과\n전체 $totalCount건 (MAX 45건 표기)',
+                                style: const TextStyle(fontSize: 15,
+                                    color: Color.fromARGB(
+                                        255, 106, 47, 14))),
+                            OutlinedButton(
+                              onPressed: () {
+                                // startController();
+                                int rngNum = currSelctedItem +
+                                    Random().nextInt(_itemCount) + 45;
 
-                              Future<void> animationEnd = scrollController
-                                  .animateToItem(
-                                  rngNum, duration: const Duration(seconds: 5),
-                                  curve: Curves.easeInOutExpo);
+                                Future<void> animationEnd = scrollController
+                                    .animateToItem(
+                                    rngNum, duration: const Duration(seconds: 5),
+                                    curve: Curves.easeInOutExpo);
 
-                              animationEnd.then((value) {
-                                showDialog<String>(
-                                  context: context,
-                                  barrierDismissible: true,
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                        insetPadding: const EdgeInsets.all(0),
-                                        child: WebViewX(
-                                          initialContent: 'https://place.map.kakao.com/${snapshot
-                                              .data!
-                                              .documents
-                                              ?.elementAt(rngNum % _itemCount)
-                                              .id}',
-                                          initialSourceType: SourceType.url,
-                                          onWebViewCreated: (controller) =>
-                                          webviewController = controller,
-                                          height: screenSize.height / 1.2,
-                                          width: min(
-                                              screenSize.width * 0.8, 1024),
-                                        )
-                                    );
-                                  },
-                                );
-                              });
-                            },
-                            style: ButtonStyle(
-                                fixedSize: MaterialStateProperty.all(const Size(
-                                    100, 50))),
-                            child: const Text('골라줘!', style: TextStyle(
-                                color: Color.fromARGB(255, 106, 47, 14))),
-                          )
-                        ],
+                                animationEnd.then((value) {
+                                  showDialog<String>(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                          insetPadding: const EdgeInsets.all(0),
+                                          child: WebViewX(
+                                            initialContent: 'https://place.map.kakao.com/m/${snapshot
+                                                .data!
+                                                .documents
+                                                ?.elementAt(rngNum % _itemCount)
+                                                .id}',
+                                            initialSourceType: SourceType.url,
+                                            onWebViewCreated: (controller) =>
+                                            webviewController = controller,
+                                            height: screenSize.height / 1.2,
+                                            width: min(
+                                                screenSize.width * 0.9, 1024),
+                                          )
+                                      );
+                                    },
+                                  );
+                                });
+                              },
+                              style:
+                              // OutlinedButton.styleFrom(side: BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14))),
+                              ButtonStyle(
+                                  fixedSize: MaterialStateProperty.all(const Size(100, 50)), side: MaterialStateProperty.all(const BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14)))),
+                              child: const Text('골라줘!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,
+                                  color: Color.fromARGB(255, 106, 47, 14))),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -175,7 +178,7 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                                 return Dialog(
                                     insetPadding: const EdgeInsets.all(0),
                                     child: WebViewX(
-                                      initialContent: 'https://place.map.kakao.com/${snapshot
+                                      initialContent: 'https://place.map.kakao.com/m/${snapshot
                                           .data!
                                           .documents
                                           ?.elementAt(index)
@@ -184,7 +187,7 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                                       onWebViewCreated: (controller) =>
                                       webviewController = controller,
                                       height: screenSize.height / 1.2,
-                                      width: min(screenSize.width * 0.8, 1024),
+                                      width: min(screenSize.width * 0.9, 1024),
                                     )
                                 );
                               },
@@ -221,41 +224,54 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                                           shape: Border.all(width: 1,
                                               color: const Color.fromARGB(
                                                   255, 106, 47, 14)),
-                                          title: Row(
-                                            // crossAxisAlignment: CrossAxisAlignment.center,
+                                          title:
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
-                                              Container(
-                                                width: 280,
-                                                margin: const EdgeInsets.only(
-                                                    right: 5),
-                                                child: Flex(
-                                                    direction: Axis.horizontal,
-                                                    children: [
-                                                      Flexible(child: Text(
-                                                          e.placeName!,
-                                                          style: const TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight: FontWeight
-                                                                  .bold,
-                                                              color: Color
-                                                                  .fromARGB(
-                                                                  255, 106, 47,
-                                                                  14))))
-                                                    ]
-                                                ),
+                                              Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                children: [
+                                                  Container(
+                                                    // alignment: Alignment.centerLeft,
+                                                    width: 200,
+                                                    margin: const EdgeInsets.only(right: 5),
+                                                    child: Flex(
+                                                        direction: Axis.horizontal,
+                                                        children: [
+                                                          Flexible(child: Text(
+                                                              e.placeName!,
+                                                              style: const TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight: FontWeight
+                                                                      .bold,
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                      255, 106, 47,
+                                                                      14))))
+                                                        ]
+                                                    ),
+                                                  ),
+                                                  Text('${e.distance!}m',
+                                                      style: const TextStyle(
+                                                          color: Color.fromARGB(
+                                                              255, 106, 47, 14)))
+                                                ],
                                               ),
                                               Flexible(child: Text(
                                                   e.categoryName!.replaceAll(
                                                       "음식점 > ", ""),
-                                                  style: const TextStyle(
+                                                  style: const TextStyle(fontSize: 14,
                                                       color: Color.fromARGB(
                                                           255, 106, 47, 14))))
                                             ],
                                           ),
-                                          subtitle: Text('${e.distance!}m',
-                                              style: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 106, 47, 14))),
+                                          // subtitle: Text('${e.distance!}m',
+                                          //     style: const TextStyle(
+                                          //         color: Color.fromARGB(
+                                          //             255, 106, 47, 14))),
                                           // isThreeLine: true,
                                         ),
                                       ),

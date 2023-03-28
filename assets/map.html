@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>
     <meta charset="utf-8"/>
     <title>현재 위치</title>
     <style>
-        .map_wrap {position:relative;width:100%;height:500px;}
+        .map_wrap {position:relative;width:100%;height:450px;}
         .title {font-weight:bold;display:block;}
         .hAddr {position:absolute;left:10px;top:10px;border-radius: 2px;background:#fff;background:rgba(255,255,255,0.8);z-index:1;padding:5px;}
         #centerAddr {display:block;margin-top:2px;font-weight: normal;}
-        .bAddr {padding:5px;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;}
+        .bAddr {width:100%;max-width:330px;padding:5px;text-overflow: ellipsis;overflow: hidden;white-space: normal;}
     </style>
 </head>
-<body>
+<body style>
 <div class="map_wrap">
     <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
 </div>
 
 <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=805bf9de3cbac260157de2dbe231b4c4&libraries=services"></script>
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=fc461d2d5fe46103930ae05103becc2e&libraries=services"></script>
 <script>
             // 부모창에서 데이터 넘겨 받는 리스너
             window.addEventListener("message", function(event) {
@@ -47,14 +47,18 @@
                         if (status === kakao.maps.services.Status.OK) {
 
                             var address = ''; // 부모창으로 전달할 주소정보
-                            var detailAddr = !!result[0].road_address ? '<div>도로명 : ' + result[0].road_address.address_name + ' ' + result[0].road_address.building_name + '</div>' : '';
-                            detailAddr += '<div>지번 : ' + result[0].address.address_name + '</div>';
+                            var detailAddr = '';
+
+                            //var detailAddr = !!result[0].road_address ? '<div>도로명 : ' + result[0].road_address.address_name + ' ' + result[0].road_address.building_name + '</div>' : '';
+                            //detailAddr += '<div>지번 : ' + result[0].address.address_name + '</div>';
 
                             // 도로명 주소 있으면 우선적으로 세팅
                             if(!!result[0].road_address){
                                 address = result[0].road_address.address_name + ' ' + result[0].road_address.building_name;
+                                detailAddr = '<div>' + address + '</div>';
                             }else{
                                 address = result[0].address.address_name;
+                                detailAddr = '<div>' + address + '</div>';
                             }
 
                             var content = '<div class="bAddr">' +

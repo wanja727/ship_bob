@@ -24,7 +24,7 @@ class CurrentLocationState extends ConsumerState<CurrentLocation> {
     UserPos pos = ref.read(userPosProvider);
 
     // iframe 설정값
-    _iFrameElement.src = 'assets/map.html';
+    _iFrameElement.src = 'assets/assets/map.html';
     _iFrameElement.style.width = '100%';
     _iFrameElement.style.height = '100%';
     _iFrameElement.style.border = 'none';
@@ -59,6 +59,7 @@ class CurrentLocationState extends ConsumerState<CurrentLocation> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 106, 47, 14),
@@ -67,36 +68,36 @@ class CurrentLocationState extends ConsumerState<CurrentLocation> {
       body: Column(
         children: [
           SizedBox(
-            height: (MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top) *
-                0.70,
+            height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.7,
             width: double.infinity,
             child: HtmlElementView(key: UniqueKey(), viewType: 'naver-map'),
           ),
-          OutlinedButton(
-            child:
-                const Text('이 위치로 변경', style: TextStyle(color: Colors.black)),
-            onPressed: () {
+          Container(margin: EdgeInsets.only(top: 10),
+            child: OutlinedButton(
+              child:
+                  const Text('이 위치로 변경', style: TextStyle(color: Colors.black)),
+              onPressed: () {
 
-              // iframe에서 값 받아오는 리스너 삭제 (안하면 계속 쌓임)
-              window.removeEventListener("message", clickListener);
+                // iframe에서 값 받아오는 리스너 삭제 (안하면 계속 쌓임)
+                window.removeEventListener("message", clickListener);
 
-              // 기존 객체
-              UserPos pos = ref.read(userPosProvider);
+                // 기존 객체
+                UserPos pos = ref.read(userPosProvider);
 
-              // 신규 객체
-              UserPos newPos = UserPos();
-              // 기존 객체의 값을 받아서 동일하게 세팅한다
-              newPos.setUserPos(pos.lat, pos.lng, pos.address);
+                // 신규 객체
+                UserPos newPos = UserPos();
+                // 기존 객체의 값을 받아서 동일하게 세팅한다
+                newPos.setUserPos(pos.lat, pos.lng, pos.address);
 
-              // state 값을 신규 객체로 바꿔줌으로서 변경사항 반영되도록 한다
-              ref.read(userPosProvider.notifier).update((state) => newPos);
-              Navigator.pop(
-                context,
-              );
-            },
-            style: ButtonStyle(
-                fixedSize: MaterialStateProperty.all(Size(200, 50))),
+                // state 값을 신규 객체로 바꿔줌으로서 변경사항 반영되도록 한다
+                ref.read(userPosProvider.notifier).update((state) => newPos);
+                Navigator.pop(
+                  context,
+                );
+              },
+              style: ButtonStyle(
+                  fixedSize: MaterialStateProperty.all(Size(200, 50))),
+            ),
           )
         ],
       ),

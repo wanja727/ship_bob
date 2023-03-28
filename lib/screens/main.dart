@@ -141,7 +141,10 @@ class HomePageState extends ConsumerState<HomePage> {
           const Column(mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image(image: AssetImage('assets/icon.jfif'),width: 200, height: 200),
-                Text('근 밥', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 106, 47, 14))),Text('(근처 밥집, 음식점 고르기)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 106, 47, 14)),)]),
+                Text('쉽 밥', style: TextStyle(fontSize: 44, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 106, 47, 14))),
+                Text('"쉽게 밥집을 찾아가자" 라는 뜻으로,', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 106, 47, 14))),
+                Text('음식과 음식점을 고르는 데 도움을 줄 수 있는 서비스입니다.', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 106, 47, 14))),
+              ]),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -149,7 +152,7 @@ class HomePageState extends ConsumerState<HomePage> {
                 child: Consumer(
                   builder: (context, ref, _) {
                     UserPos pos = ref.watch(userPosProvider);
-                    return Text(pos.address, style: const TextStyle(fontSize: 20, color: Color.fromARGB(255, 106, 47, 14)));
+                    return Text(pos.address, style: const TextStyle(fontSize: 14, color: Color.fromARGB(255, 106, 47, 14)));
                   },
                 ),
               ),
@@ -173,21 +176,21 @@ class HomePageState extends ConsumerState<HomePage> {
               );
             },
             style: ButtonStyle(
-                fixedSize: MaterialStateProperty.all(const Size(200, 50))),
+                fixedSize: MaterialStateProperty.all(const Size(200, 50)), side: MaterialStateProperty.all(const BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14)))),
             child:
             const Text('내 주변 음식점', style: TextStyle(color: Color.fromARGB(255, 106, 47, 14))),
           ),
           OutlinedButton(
             onPressed: null,
             style: ButtonStyle(
-                fixedSize: MaterialStateProperty.all(const Size(200, 50)), backgroundColor: const MaterialStatePropertyAll(Colors.black12)),
+                fixedSize: MaterialStateProperty.all(const Size(200, 50)), backgroundColor: const MaterialStatePropertyAll(Colors.black12), side: MaterialStateProperty.all(const BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14)))),
             child: const Text('땡기는 음식 찾아보기',
                 style: TextStyle(color: Color.fromARGB(255, 106, 47, 14))),
           ),
           OutlinedButton(
             onPressed: null,
             style: ButtonStyle(
-                fixedSize: MaterialStateProperty.all(const Size(200, 50)),backgroundColor: const MaterialStatePropertyAll(Colors.black12)),
+                fixedSize: MaterialStateProperty.all(const Size(200, 50)),backgroundColor: const MaterialStatePropertyAll(Colors.black12), side: MaterialStateProperty.all(const BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14)))),
             child:
                 const Text('나만의 리스트', style: TextStyle(color: Color.fromARGB(255, 106, 47, 14))),
           )
