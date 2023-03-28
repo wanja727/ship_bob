@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakao_map/screens/main.dart';
-import 'package:kakao_map/kakaomap_api.dart';
+import 'package:kakao_map/main.dart';
+import 'package:kakao_map/service/kakaomap_api.dart';
 import 'package:kakao_map/models/category_response.dart';
 import 'package:clickable_list_wheel_view/clickable_list_wheel_widget.dart';
 import 'package:webviewx/webviewx.dart';

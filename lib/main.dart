@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
 import 'package:kakao_map/screens/current_location.dart';
-import 'near_restaurants.dart';
+import 'screens/near_restaurants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakao_map/kakaomap_api.dart';
+import 'package:kakao_map/service/kakaomap_api.dart';
 import 'package:kakao_map/models/category_response.dart';
 
 void main() {

@@ -3,7 +3,7 @@ import 'dart:html';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakao_map/screens/main.dart';
+import 'package:kakao_map/main.dart';
 
 var clickListener;
 double lat = 0, lng = 0;

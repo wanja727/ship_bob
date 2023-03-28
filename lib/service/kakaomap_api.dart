@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_map/models/category_response.dart' as category;
 import 'package:kakao_map/models/coord2address_response.dart';
-import 'package:kakao_map/screens/main.dart';
+import 'package:kakao_map/main.dart';
 
 class KakaoMapApi{
 
