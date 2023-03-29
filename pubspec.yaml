@@ -40,8 +40,11 @@ dependencies:
   geolocator: ^9.0.2
   intl: ^0.18.0
   flutter_riverpod: ^2.3.2
-  clickable_list_wheel_view: ^0.2.0
+  clickable_list_wheel_view:
+    git:
+      url: https://github.com/wanja727/clickable_list_wheel_view.git
   webviewx: ^0.2.2
+  pointer_interceptor: ^0.9.3+4
 
 dev_dependencies:
   flutter_test:

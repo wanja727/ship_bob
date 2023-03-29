@@ -8,6 +8,8 @@ import 'package:kakao_map/service/kakaomap_api.dart';
 import 'package:kakao_map/models/category_response.dart';
 import 'package:clickable_list_wheel_view/clickable_list_wheel_widget.dart';
 import 'package:webviewx/webviewx.dart';
+import 'package:kakao_map/widgets/iframe_elements.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 final scrollController = FixedExtentScrollController();
 late int listIndex;
@@ -84,209 +86,225 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
           backgroundColor: const Color.fromARGB(255, 106, 47, 14),
           title: const Text('내 주변 음식점'),
         ),
-        body: FutureBuilder<CategoryResponse>(
-            future: futureList,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Column(
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 600,
-                        margin: const EdgeInsets.all(10),
-                        child:
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                                '반경 500m이내  \'음식점\'  검색결과\n전체 $totalCount건 (MAX 45건 표기)',
-                                style: const TextStyle(fontSize: 15,
-                                    color: Color.fromARGB(
-                                        255, 106, 47, 14))),
-                            OutlinedButton(
-                              onPressed: () {
-                                // startController();
-                                int rngNum = currSelctedItem +
-                                    Random().nextInt(_itemCount) + 45;
+        body: Column(
+          children: [
+            FutureBuilder<CategoryResponse>(
+                future: futureList,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 600,
+                            margin: const EdgeInsets.all(10),
+                            child:
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    '반경 500m이내  \'음식점\'  검색결과\n전체 $totalCount건 (MAX 45건 표기)',
+                                    style: const TextStyle(fontSize: 15, color: Color.fromARGB(255, 106, 47, 14))),
 
-                                Future<void> animationEnd = scrollController
-                                    .animateToItem(
-                                    rngNum, duration: const Duration(seconds: 5),
-                                    curve: Curves.easeInOutExpo);
+                                OutlinedButton(
+                                  onPressed: () {
 
-                                animationEnd.then((value) {
-                                  showDialog<String>(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                          insetPadding: const EdgeInsets.all(0),
-                                          child: WebViewX(
-                                            initialContent: 'https://place.map.kakao.com/m/${snapshot
-                                                .data!
-                                                .documents
-                                                ?.elementAt(rngNum % _itemCount)
-                                                .id}',
-                                            initialSourceType: SourceType.url,
-                                            onWebViewCreated: (controller) =>
-                                            webviewController = controller,
-                                            height: screenSize.height / 1.2,
-                                            width: min(
-                                                screenSize.width * 0.9, 1024),
-                                          )
+                                    // 랜덤으로 음식점 선택하는 로직
+                                    int rngNum = currSelctedItem + Random().nextInt(_itemCount) + 45;
+                                    int index = rngNum % _itemCount; // 몇번째 음식점 정보인지 계산
+
+                                    // 선택된 음식점으로 스크롤
+                                    Future<void> animationEnd = scrollController
+                                        .animateToItem(
+                                        rngNum, duration: const Duration(seconds: 5),
+                                        curve: Curves.easeInOutExpo);
+
+                                    // 애니메이션 끝나면
+                                    animationEnd.then((value) {
+                                      // 음식점 정보 팝업 호출
+                                      showDialog<String>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return ShowRestaurantInfo(index: index, screenSize: screenSize, snapshot: snapshot);
+                                        },
                                       );
-                                    },
-                                  );
-                                });
-                              },
-                              style:
-                              // OutlinedButton.styleFrom(side: BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14))),
-                              ButtonStyle(
-                                  fixedSize: MaterialStateProperty.all(const Size(100, 50)), side: MaterialStateProperty.all(const BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14)))),
-                              child: const Text('골라줘!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,
-                                  color: Color.fromARGB(255, 106, 47, 14))),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: (MediaQuery
-                          .of(context)
-                          .size
-                          .height - 126),
-                      width: 600,
-                      child: ClickableListWheelScrollView(
-                          loop: true,
-                          scrollController: scrollController,
-                          itemHeight: _itemHeight,
-                          itemCount: _itemCount,
-                          onItemTapCallback: (index) {
-                            // print("onItemTapCallback index: $index");
-                            index = index % _itemCount;
-                            // print("보정후에 index: $index");
 
-                            // 추후 삭제 기능 구현시 사용
-                            // setState(() {
-                            //   snapshot.data!.documents?.removeAt(index);
-                            // });
-
-                            showDialog<String>(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (BuildContext context) {
-                                return Dialog(
-                                    insetPadding: const EdgeInsets.all(0),
-                                    child: WebViewX(
-                                      initialContent: 'https://place.map.kakao.com/m/${snapshot
-                                          .data!
-                                          .documents
-                                          ?.elementAt(index)
-                                          .id}',
-                                      initialSourceType: SourceType.url,
-                                      onWebViewCreated: (controller) =>
-                                      webviewController = controller,
-                                      height: screenSize.height / 1.2,
-                                      width: min(screenSize.width * 0.9, 1024),
-                                    )
-                                );
-                              },
-                            );
-                          },
-                          child: ListWheelScrollView.useDelegate(
-                            onSelectedItemChanged: (value) {
-                              // print('value : $value');
-                              // print('scrollController.selectedItem : ${scrollController.selectedItem}');
-                              setState(() {
-                                currSelctedItem = scrollController.selectedItem;
-                              });
-                            },
-                            controller: scrollController,
-                            itemExtent: _itemHeight,
-                            diameterRatio: 5,
-                            // useMagnifier: true,
-                            // magnification: 1.1,
-                            physics: const FixedExtentScrollPhysics(),
-                            childDelegate: ListWheelChildLoopingListDelegate(
-                              children: <Widget>[
-                                ...?snapshot.data!.documents?.map((e) =>
-                                    Container(
-                                      width: 600,
-                                      margin: const EdgeInsets.all(10),
-                                      child: Material(
-                                        color: snapshot.data!.documents
-                                            ?.indexOf(e) ==
-                                            currSelctedItem % _itemCount
-                                            ? const Color.fromARGB(
-                                            255, 243, 194, 165)
-                                            : Colors.white,
-                                        child: ListTile(
-                                          shape: Border.all(width: 1,
-                                              color: const Color.fromARGB(
-                                                  255, 106, 47, 14)),
-                                          title:
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-
-                                                children: [
-                                                  Container(
-                                                    // alignment: Alignment.centerLeft,
-                                                    width: 200,
-                                                    margin: const EdgeInsets.only(right: 5),
-                                                    child: Flex(
-                                                        direction: Axis.horizontal,
-                                                        children: [
-                                                          Flexible(child: Text(
-                                                              e.placeName!,
-                                                              style: const TextStyle(
-                                                                  fontSize: 18,
-                                                                  fontWeight: FontWeight
-                                                                      .bold,
-                                                                  color: Color
-                                                                      .fromARGB(
-                                                                      255, 106, 47,
-                                                                      14))))
-                                                        ]
-                                                    ),
-                                                  ),
-                                                  Text('${e.distance!}m',
-                                                      style: const TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255, 106, 47, 14)))
-                                                ],
-                                              ),
-                                              Flexible(child: Text(
-                                                  e.categoryName!.replaceAll(
-                                                      "음식점 > ", ""),
-                                                  style: const TextStyle(fontSize: 14,
-                                                      color: Color.fromARGB(
-                                                          255, 106, 47, 14))))
-                                            ],
-                                          ),
-                                          // subtitle: Text('${e.distance!}m',
-                                          //     style: const TextStyle(
-                                          //         color: Color.fromARGB(
-                                          //             255, 106, 47, 14))),
-                                          // isThreeLine: true,
-                                        ),
-                                      ),
-                                    )),
+                                    });
+                                  },
+                                  style:
+                                  // OutlinedButton.styleFrom(side: BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14))),
+                                  ButtonStyle(
+                                      fixedSize: MaterialStateProperty.all(const Size(100, 50)), side: MaterialStateProperty.all(const BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14)))),
+                                  child: const Text('골라줘!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,
+                                      color: Color.fromARGB(255, 106, 47, 14))),
+                                )
                               ],
                             ),
-                          )),
-                    ),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.hasError}');
-              }
-              return const CircularProgressIndicator();
-            })
+                          ),
+                        ),
+                        SizedBox(
+                          height: (MediaQuery.of(context).size.height - 180),
+                          width: 600,
+                          child: ClickableListWheelScrollView(
+                              loop: true,
+                              scrollController: scrollController,
+                              itemHeight: _itemHeight,
+                              itemCount: _itemCount,
+                              onItemTapCallback: (index) {
+                                // print("onItemTapCallback index: $index");
+                                index = index % _itemCount;
+                                // print("보정후에 index: $index");
+
+                                // 추후 삭제 기능 구현시 사용
+                                // setState(() {
+                                //   snapshot.data!.documents?.removeAt(index);
+                                // });
+
+                                // 음식점 정보 팝업 호출
+                                showDialog<String>(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return ShowRestaurantInfo(index: index, screenSize: screenSize, snapshot: snapshot);
+                                  },
+                                );
+
+                              },
+                              child: ListWheelScrollView.useDelegate(
+                                onSelectedItemChanged: (value) {
+                                  // print('value : $value');
+                                  // print('scrollController.selectedItem : ${scrollController.selectedItem}');
+                                  setState(() {
+                                    currSelctedItem = scrollController.selectedItem;
+                                  });
+                                },
+                                controller: scrollController,
+                                itemExtent: _itemHeight,
+                                diameterRatio: 5,
+                                // useMagnifier: true,
+                                // magnification: 1.1,
+                                physics: const FixedExtentScrollPhysics(),
+                                childDelegate: ListWheelChildLoopingListDelegate(
+                                  children: <Widget>[
+                                    ...?snapshot.data!.documents?.map((e) =>
+                                        Container(
+                                          width: 600,
+                                          margin: const EdgeInsets.all(10),
+                                          child: Material(
+                                            color: snapshot.data!.documents
+                                                ?.indexOf(e) ==
+                                                currSelctedItem % _itemCount
+                                                ? const Color.fromARGB(
+                                                255, 243, 194, 165)
+                                                : Colors.white,
+                                            child: ListTile(
+                                              shape: Border.all(width: 1,
+                                                  color: const Color.fromARGB(
+                                                      255, 106, 47, 14)),
+                                              title:
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                    children: [
+                                                      Container(
+                                                        // alignment: Alignment.centerLeft,
+                                                        width: 200,
+                                                        margin: const EdgeInsets.only(right: 5),
+                                                        child: Flex(
+                                                            direction: Axis.horizontal,
+                                                            children: [
+                                                              Flexible(child: Text(
+                                                                  e.placeName!,
+                                                                  style: const TextStyle(
+                                                                      fontSize: 18,
+                                                                      fontWeight: FontWeight
+                                                                          .bold,
+                                                                      color: Color
+                                                                          .fromARGB(
+                                                                          255, 106, 47,
+                                                                          14))))
+                                                            ]
+                                                        ),
+                                                      ),
+                                                      Text('${e.distance!}m',
+                                                          style: const TextStyle(
+                                                              color: Color.fromARGB(
+                                                                  255, 106, 47, 14)))
+                                                    ],
+                                                  ),
+                                                  Flexible(child: Text(
+                                                      e.categoryName!.replaceAll(
+                                                          "음식점 > ", ""),
+                                                      style: const TextStyle(fontSize: 14,
+                                                          color: Color.fromARGB(
+                                                              255, 106, 47, 14))))
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                              )),
+                        ),
+                      ],
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('${snapshot.hasError}');
+                  }
+                  return const CircularProgressIndicator();
+                }),
+          ],
+        ),
+        bottomNavigationBar: const KakaoAdfitWebviewx(),
+    );
+  }
+}
+
+// 음식점 정보 팝업 위젯
+class ShowRestaurantInfo extends StatefulWidget {
+  const ShowRestaurantInfo({Key? key, required this.snapshot, required this.index, required this.screenSize}) : super(key: key);
+
+  final AsyncSnapshot<CategoryResponse> snapshot;
+  final int index;
+  final Size screenSize;
+
+  @override
+  State<ShowRestaurantInfo> createState() => _ShowRestaurantInfoState();
+}
+
+class _ShowRestaurantInfoState extends State<ShowRestaurantInfo> {
+
+  late WebViewXController webviewController;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return PointerInterceptor(
+      child: AlertDialog(
+        titlePadding: EdgeInsets.zero,
+        insetPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        content: WebViewX(
+          initialContent: 'https://place.map.kakao.com/m/${widget.snapshot.data!.documents?.elementAt(widget.index).id}',
+          initialSourceType: SourceType.url,
+          onWebViewCreated: (controller) => webviewController = controller,
+          height: widget.screenSize.height / 1.1,
+          width: min(widget.screenSize.width * 0.9, 1024),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('닫기'),
+          ),
+        ],
+      ),
     );
   }
 }

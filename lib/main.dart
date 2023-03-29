@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kakao_map/screens/current_location.dart';
-import 'package:kakao_map/widgets/adfit.dart';
+import 'package:kakao_map/widgets/iframe_elements.dart';
 import 'screens/near_restaurants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_map/service/kakaomap_api.dart';
 import 'package:kakao_map/models/category_response.dart';
+
 
 void main() {
   runApp(
@@ -192,10 +193,10 @@ class HomePageState extends ConsumerState<HomePage> {
                 fixedSize: MaterialStateProperty.all(const Size(200, 50)),backgroundColor: const MaterialStatePropertyAll(Colors.black12), side: MaterialStateProperty.all(const BorderSide(width: 1, color: Color.fromARGB(255, 106, 47, 14)))),
             child:
                 const Text('나만의 리스트', style: TextStyle(color: Color.fromARGB(255, 106, 47, 14))),
-          )
+          ),
         ],
       ),
-      bottomNavigationBar: Container(alignment: Alignment.center,width: 320, height: 50,child: Adfit()),
+      bottomNavigationBar: const KakaoAdfitWebviewx(),
     );
   }
 }
