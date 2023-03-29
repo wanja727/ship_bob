@@ -10,6 +10,8 @@ import 'package:clickable_list_wheel_view/clickable_list_wheel_widget.dart';
 import 'package:webviewx/webviewx.dart';
 import 'package:kakao_map/widgets/iframe_elements.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'dart:html' as html;
+import 'package:flutter/foundation.dart';
 
 final scrollController = FixedExtentScrollController();
 late int listIndex;
@@ -36,6 +38,8 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
 
   @override
   void initState() {
+    print("현재 접속중인 기기 : $defaultTargetPlatform");
+
     UserPos pos = ref.read(userPosProvider);
 
     // 가게 이름 앞에 붙일 숫자 초기화
@@ -122,13 +126,17 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                                     // 애니메이션 끝나면
                                     animationEnd.then((value) {
                                       // 음식점 정보 팝업 호출
-                                      showDialog<String>(
-                                        context: context,
-                                        barrierDismissible: false,
-                                        builder: (BuildContext context) {
-                                          return ShowRestaurantInfo(index: index, screenSize: screenSize, snapshot: snapshot);
-                                        },
-                                      );
+                                      if(defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS){
+                                        html.window.open('https://place.map.kakao.com/${snapshot.data!.documents?.elementAt(index).id}', 'new tab');
+                                      }else {
+                                        showDialog<String>(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (BuildContext context) {
+                                            return ShowRestaurantInfo(index: index, screenSize: screenSize, snapshot: snapshot);
+                                          },
+                                        );
+                                      }
 
                                     });
                                   },
@@ -162,13 +170,17 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                                 // });
 
                                 // 음식점 정보 팝업 호출
-                                showDialog<String>(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return ShowRestaurantInfo(index: index, screenSize: screenSize, snapshot: snapshot);
-                                  },
-                                );
+                                if(defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS){
+                                  html.window.open('https://place.map.kakao.com/${snapshot.data!.documents?.elementAt(index).id}', 'new tab');
+                                }else{
+                                  showDialog<String>(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return ShowRestaurantInfo(index: index, screenSize: screenSize, snapshot: snapshot);
+                                    },
+                                  );
+                                }
 
                               },
                               child: ListWheelScrollView.useDelegate(
@@ -286,13 +298,14 @@ class _ShowRestaurantInfoState extends State<ShowRestaurantInfo> {
   @override
   Widget build(BuildContext context) {
 
-    return PointerInterceptor(
+    return
+      PointerInterceptor(
       child: AlertDialog(
         titlePadding: EdgeInsets.zero,
         insetPadding: EdgeInsets.zero,
         contentPadding: EdgeInsets.zero,
         content: WebViewX(
-          initialContent: 'https://place.map.kakao.com/m/${widget.snapshot.data!.documents?.elementAt(widget.index).id}',
+          initialContent: 'https://place.map.kakao.com/${widget.snapshot.data!.documents?.elementAt(widget.index).id}',
           initialSourceType: SourceType.url,
           onWebViewCreated: (controller) => webviewController = controller,
           height: widget.screenSize.height / 1.1,
