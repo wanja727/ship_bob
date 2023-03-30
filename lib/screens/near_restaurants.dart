@@ -152,7 +152,7 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                           ),
                         ),
                         SizedBox(
-                          height: (MediaQuery.of(context).size.height - 180),
+                          height: (MediaQuery.of(context).size.height - 190),
                           width: 600,
                           child: ClickableListWheelScrollView(
                               loop: true,
@@ -274,7 +274,7 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                 }),
           ],
         ),
-        bottomNavigationBar: const KakaoAdfitWebviewx(),
+        bottomNavigationBar: Container(margin: const EdgeInsets.only(top: 10), child: const KakaoAdfitWebviewx()),
     );
   }
 }
