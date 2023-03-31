@@ -40,13 +40,12 @@ class KakaoMapApi{
   }
 
   // 근처 카테고리 검색
-  // Future<List<category.Documents>>
     Future<category.CategoryResponse> getNearRestaurants (WidgetRef ref, double lat, double lng, int radius) async {
 
-    // API 결과저장
-    category.CategoryResponse categoryResponse;
+    // API 원본 결과 (1건에 대한 결과)
+    category.CategoryResponse originalResponse;
 
-    // 최종 리턴값
+    // 최종 리턴값 (3건을 합치고 가공한 결과)
     category.CategoryResponse resultCategoryResponse = category.CategoryResponse();
     List<category.Documents> resultDocuments = [];
     category.Meta resultMeta;
@@ -56,10 +55,22 @@ class KakaoMapApi{
     http.Response response;
 
     // 동일 조건일 경우 API호출 안하고 이전 데이터 리턴하도록
-    category.CategoryResponse categoryRes = ref.read(categoryResponseProvider);
-    if(categoryRes.meta?.lat == lat && categoryRes.meta?.lng == lng && categoryRes.meta?.radius == radius){
+    category.CategoryResponse cateResProvider = ref.read(categoryResponseProvider);
+    if(cateResProvider.meta?.lat == lat && cateResProvider.meta?.lng == lng && cateResProvider.meta?.radius == radius){
       print('API호출 안하고 기존 데이터 사용함 (동일한 조건으로 API호출시)');
-      return categoryRes;
+
+      // Deep Copy
+      category.Documents documents;
+      List<category.Documents> duplicatedDocuments = [];
+
+      cateResProvider.documents?.asMap().forEach((index, value) {
+        documents = category.Documents.fromJson(value.toJson());
+        duplicatedDocuments.add(documents);
+      });
+
+      resultCategoryResponse.meta = cateResProvider.meta;
+      resultCategoryResponse.documents = duplicatedDocuments;
+      return resultCategoryResponse;
     }
 
     while(true) {
@@ -72,16 +83,16 @@ class KakaoMapApi{
         // print(response.body);
 
         // json->객체 매핑
-        categoryResponse = category.CategoryResponse.fromJson(jsonDecode(response.body));
+        originalResponse = category.CategoryResponse.fromJson(jsonDecode(response.body));
 
-        resultMeta = categoryResponse.meta!;
-        resultDocuments.addAll(categoryResponse.documents as Iterable<category.Documents>);
+        resultMeta = originalResponse.meta!;
+        resultDocuments.addAll(originalResponse.documents as Iterable<category.Documents>);
 
         resultCategoryResponse.meta = resultMeta; // shallow copy 일 것 같은데 상관없어 보임
         resultCategoryResponse.documents = resultDocuments;
 
         // 리스트 append 하고 리턴
-        if (categoryResponse.meta?.isEnd == true) {
+        if (originalResponse.meta?.isEnd == true) {
 
           resultCategoryResponse.meta?.lat = lat;
           resultCategoryResponse.meta?.lng = lng;
@@ -91,16 +102,25 @@ class KakaoMapApi{
           //   element.placeName = '${resultDocuments.indexOf(element)+1}.element.placeName';
           // }
 
+          // Deep Copy
+          category.Documents documents;
+          List<category.Documents> duplicatedDocuments = [];
+
           resultDocuments.asMap().forEach((index, value) {
             value.placeName = '${index+1}.${value.placeName}';
+            value.categoryName = value.categoryName?.replaceAll("음식점 > ", "");
+
+            documents = category.Documents.fromJson(value.toJson());
+            duplicatedDocuments.add(documents);
           });
 
-          categoryRes.setCategoryResponse(resultDocuments, resultMeta);
+          // 검색결과 프로바이더에 저장
+          cateResProvider.setCategoryResponse(duplicatedDocuments, resultMeta);
 
           return resultCategoryResponse;
 
           // 검색 결과가 더 있으면 추가적으로 요청함
-        } else if (categoryResponse.meta?.isEnd == false) {
+        } else if (originalResponse.meta?.isEnd == false) {
           page++;
 
           // API 스펙 자체가 최대 45건 까지만 받을수 있음

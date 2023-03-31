@@ -82,7 +82,8 @@ class HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
 
-    CategoryResponse categoryRes = ref.read(categoryResponseProvider);
+    // API 검색 결과 원본
+    CategoryResponse cateResProvider = ref.read(categoryResponseProvider);
 
     UserPos pos = ref.read(userPosProvider);
     pos.setUserPos(0, 0, '');
