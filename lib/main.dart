@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kakao_map/screens/current_location.dart';
 import 'package:kakao_map/widgets/iframe_elements.dart';
 import 'screens/near_restaurants.dart';
@@ -9,7 +10,11 @@ import 'package:kakao_map/service/kakaomap_api.dart';
 import 'package:kakao_map/models/category_response.dart';
 
 
-void main() {
+Future<void> main() async {
+
+  // .env 파일 로드
+  await dotenv.load(fileName: ".env");
+
   runApp(
     ProviderScope(
       child: const MyApp(),

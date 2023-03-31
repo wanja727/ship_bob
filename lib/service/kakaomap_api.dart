@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_map/models/category_response.dart' as category;
@@ -8,13 +9,14 @@ import 'package:kakao_map/main.dart';
 
 class KakaoMapApi{
 
+  String? KAKAO_REST_API_KEY = dotenv.env['KAKAO_REST_API_KEY'];
+
   // 좌표->주소 변경
   Future<String> getAddress (double lat, double lng) async {
     String address = "";
     
     Uri uri = Uri.parse("https://dapi.kakao.com/v2/local/geo/coord2address.json?x=$lng&y=$lat&input_coord=WGS84");
-
-    final response = await http.get(uri, headers: {"Authorization": "KakaoAK 90a5b736903df69338d565b1f3fa99a0"});
+    final response = await http.get(uri, headers: {"Authorization": "KakaoAK $KAKAO_REST_API_KEY"});
 
     if (response.statusCode == 200) {
       // print('JSON 받아온거');
@@ -76,7 +78,7 @@ class KakaoMapApi{
     while(true) {
       // print("$page번째 API호출 : https://dapi.kakao.com/v2/local/search/category.json?category\_group\_code=FD6&y=$lat&x=$lng&radius=$radius&page=$page");
       uri = Uri.parse("https://dapi.kakao.com/v2/local/search/category.json?category\_group\_code=FD6&y=$lat&x=$lng&radius=$radius&page=$page");
-      response = await http.get(uri, headers: {"Authorization": "KakaoAK 90a5b736903df69338d565b1f3fa99a0"});
+      response = await http.get(uri, headers: {"Authorization": "KakaoAK $KAKAO_REST_API_KEY"});
 
       if (response.statusCode == 200) {
         // print('$page번째 JSON 받아온거');

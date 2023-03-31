@@ -45,6 +45,7 @@ dependencies:
       url: https://github.com/wanja727/clickable_list_wheel_view.git
   webviewx: ^0.2.2
   pointer_interceptor: ^0.9.3+4
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +82,7 @@ flutter:
 
   assets:
     - assets/
+    - .env # path to your .env
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
