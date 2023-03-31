@@ -132,7 +132,7 @@ class NearRestaurantsState extends ConsumerState<NearRestaurants> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                    '반경 500m이내  \'음식점\'  검색결과\n전체 $totalCount건 (MAX 45건 표기) $itemCount',
+                                    '반경 500m이내  \'음식점\'  검색결과\n전체 $totalCount건 중 $itemCount건 (MAX 45건 표기)',
                                     style: const TextStyle(fontSize: 15, color: Color.fromARGB(255, 106, 47, 14))),
 
                                 OutlinedButton(
