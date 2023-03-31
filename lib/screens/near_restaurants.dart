@@ -3,12 +3,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakao_map/main.dart';
-import 'package:kakao_map/service/kakaomap_api.dart';
-import 'package:kakao_map/models/category_response.dart';
+import 'package:ship_bob/main.dart';
+import 'package:ship_bob/service/kakaomap_api.dart';
+import 'package:ship_bob/models/category_response.dart';
 import 'package:clickable_list_wheel_view/clickable_list_wheel_widget.dart';
 import 'package:webviewx/webviewx.dart';
-import 'package:kakao_map/widgets/iframe_elements.dart';
+import 'package:ship_bob/widgets/iframe_elements.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart';

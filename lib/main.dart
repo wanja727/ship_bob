@@ -1,23 +1,17 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:kakao_map/screens/current_location.dart';
-import 'package:kakao_map/widgets/iframe_elements.dart';
+import 'package:ship_bob/screens/current_location.dart';
+import 'package:ship_bob/widgets/iframe_elements.dart';
 import 'screens/near_restaurants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakao_map/service/kakaomap_api.dart';
-import 'package:kakao_map/models/category_response.dart';
+import 'package:ship_bob/service/kakaomap_api.dart';
+import 'package:ship_bob/models/category_response.dart';
 
-
-Future<void> main() async {
-
-  // .env 파일 로드
-  await dotenv.load(fileName: ".env");
-
+void main() {
   runApp(
-    ProviderScope(
-      child: const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }

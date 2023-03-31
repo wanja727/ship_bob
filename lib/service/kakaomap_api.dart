@@ -1,20 +1,18 @@
 import 'dart:convert';
-
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:kakao_map/models/category_response.dart' as category;
-import 'package:kakao_map/models/coord2address_response.dart';
-import 'package:kakao_map/main.dart';
+import 'package:ship_bob/models/category_response.dart' as category;
+import 'package:ship_bob/models/coord2address_response.dart';
+import 'package:ship_bob/main.dart';
 
 class KakaoMapApi{
 
-  String? KAKAO_REST_API_KEY = dotenv.env['KAKAO_REST_API_KEY'];
+  static const KAKAO_REST_API_KEY = String.fromEnvironment('KAKAO_REST_API_KEY');
 
   // 좌표->주소 변경
   Future<String> getAddress (double lat, double lng) async {
     String address = "";
-    
+
     Uri uri = Uri.parse("https://dapi.kakao.com/v2/local/geo/coord2address.json?x=$lng&y=$lat&input_coord=WGS84");
     final response = await http.get(uri, headers: {"Authorization": "KakaoAK $KAKAO_REST_API_KEY"});
 
@@ -42,7 +40,7 @@ class KakaoMapApi{
   }
 
   // 근처 카테고리 검색
-    Future<category.CategoryResponse> getNearRestaurants (WidgetRef ref, double lat, double lng, int radius) async {
+  Future<category.CategoryResponse> getNearRestaurants (WidgetRef ref, double lat, double lng, int radius) async {
 
     // API 원본 결과 (1건에 대한 결과)
     category.CategoryResponse originalResponse;

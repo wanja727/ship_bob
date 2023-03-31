@@ -3,8 +3,8 @@ import 'dart:html';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakao_map/main.dart';
-import 'package:kakao_map/widgets/iframe_elements.dart';
+import 'package:ship_bob/main.dart';
+import 'package:ship_bob/widgets/iframe_elements.dart';
 
 var clickListener;
 double lat = 0, lng = 0;
