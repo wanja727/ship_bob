@@ -1,16 +1,5 @@
-# kakao_map
+# 쉽 밥 - 쉽게 밥집을 찾아가자
 
-A new Flutter project.
+https://ship-bob.netlify.app/
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+쉽 밥은 "쉽게 밥집을 찾아가자" 라는 뜻으로, 음식과 음식점을 고르는 데 도움을 줄 수 있는 서비스입니다.
